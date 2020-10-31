@@ -112,8 +112,8 @@ class User_model extends CI_Model {
         return $query->result();
     }
 
-    public function update_bet_amount($userId, $gameId, $betAmount, $balance) {
-        $updateBetAmount = array("bet_amount" => $betAmount);
+    public function update_bet_amount($userId, $gameId, $betAmount, $balance, $previousBetAmount) {
+        $updateBetAmount = array("bet_amount" => $previousBetAmount + $betAmount);
         $this->db->where(array('id' => $gameId, 'user_id' => $userId));
         if ($this->db->update("game", $updateBetAmount)) {
             $updateBalance = array("balance" => $balance - $betAmount);
@@ -175,6 +175,34 @@ class User_model extends CI_Model {
         }
 
         return TRUE;
+    }
+
+    public function validate_user($email, $password) {
+        $this->db->select("id, email, password");
+        $this->db->from("users");
+        $this->db->where('email', $email);
+        $query = $this->db->get();        
+        $user = $query->result();
+
+        if (count($user) > 0 && $user[0]->email === $email && password_verify($password, $user[0]->password)) {            
+            return $user[0]->id;
+        } else {
+            return FALSE;
+        }
+    }
+
+    public function is_game_over($userId, $gameId) {
+        $this->db->select("winner");
+        $this->db->from("game");
+        $this->db->where(array('user_id' => $userId, 'id' => $gameId));
+        $query = $this->db->get();        
+        $user = $query->result();
+
+        if ($user[0]->winner) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
     }
 }
 
