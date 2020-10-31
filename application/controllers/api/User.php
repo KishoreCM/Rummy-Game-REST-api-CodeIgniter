@@ -103,7 +103,7 @@ class User extends REST_Controller {
             } else {
                 $this->response(array(                
                     "message" => "Unauthorized Access. Please Login.", 
-                ), REST_Controller::HTTP_BAD_REQUEST);
+                ), REST_Controller::HTTP_UNAUTHORIZED);
             }
     }
 
@@ -132,7 +132,7 @@ class User extends REST_Controller {
         } else {
             $this->response(array(                
                 "message" => "Unauthorized Access. Please Login.", 
-            ), REST_Controller::HTTP_BAD_REQUEST);
+            ), REST_Controller::HTTP_UNAUTHORIZED);
         }
     }
 
@@ -186,7 +186,7 @@ class User extends REST_Controller {
         } else {
             $this->response(array(                
                 "message" => "Unauthorized Access. Please Login.", 
-            ), REST_Controller::HTTP_BAD_REQUEST);
+            ), REST_Controller::HTTP_UNAUTHORIZED);
         }
     }
 
@@ -223,7 +223,7 @@ class User extends REST_Controller {
         } else {
             $this->response(array(                
                 "message" => "Unauthorized Access. Please Login.", 
-            ), REST_Controller::HTTP_BAD_REQUEST);
+            ), REST_Controller::HTTP_UNAUTHORIZED);
         }
     }
 
@@ -273,7 +273,7 @@ class User extends REST_Controller {
         } else {
             $this->response(array(                
                 "message" => "Unauthorized Access. Please Login.", 
-            ), REST_Controller::HTTP_BAD_REQUEST);
+            ), REST_Controller::HTTP_UNAUTHORIZED);
         }
     }
     
