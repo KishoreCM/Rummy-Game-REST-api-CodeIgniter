@@ -33,7 +33,8 @@ class Login extends REST_Controller {
             if ($userId) {
                 // print_r("Logged In");
                 $this->session->set_userdata('user_'.$userId, 1);
-                $this->response(array(  
+                $this->response(array(
+                    "userId" => $userId,
                     "status" => "Login Success",
                     "message" => "Session Initiated",                
                 ), REST_Controller::HTTP_OK);                
