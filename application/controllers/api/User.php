@@ -109,31 +109,25 @@ class User extends REST_Controller {
 
     public function listJoinedRoomUsers_post() {
         $data = json_decode(file_get_contents("php://input"));
-        if (!isset($data->userId) || !isset($data->gameId)) {
+        if (!isset($data->gameId)) {
             $this->response(array(                
                 "message" => "Field(s) Are Missing",                
             ), REST_Controller::HTTP_BAD_REQUEST);
-        } elseif (empty($data->userId) || empty($data->gameId)) {
+        } elseif (empty($data->gameId)) {
             $this->response(array(                
                 "message" => "Field(s) Are Empty",                
             ), REST_Controller::HTTP_BAD_REQUEST);
-        } elseif ($this->session->userdata('user_'.$data->userId)) {                
-            if (!$this->user_model->is_room_created($data->gameId)) {
-                $this->response(array(                
-                    "message" => "A Room Has Not Been Created For This game_id", 
-                ), REST_Controller::HTTP_BAD_REQUEST);        
-            } else {
-                $roomUsers = $this->user_model->getJoinedRoomUsers($data->gameId);            
-                $this->response(array(      
-                    "mesage" => "User(s) Joined This Room",
-                    "data" => $roomUsers, 
-                ), REST_Controller::HTTP_OK);
-            }
-        } else {
+        } elseif (!$this->user_model->is_room_created($data->gameId)) {
             $this->response(array(                
-                "message" => "Unauthorized Access. Please Login.", 
-            ), REST_Controller::HTTP_UNAUTHORIZED);
-        }
+                "message" => "A Room Has Not Been Created For This game_id", 
+            ), REST_Controller::HTTP_BAD_REQUEST);        
+        } else {
+            $roomUsers = $this->user_model->getJoinedRoomUsers($data->gameId);            
+            $this->response(array(      
+                "mesage" => "User(s) Joined This Room",
+                "data" => $roomUsers, 
+            ), REST_Controller::HTTP_OK);
+        }        
     }
 
     public function betAmount_post() {
