@@ -185,25 +185,27 @@ class User extends REST_Controller {
     }
 
     public function addBalance_post() {        
-        $data = json_decode(file_get_contents("php://input"));
+        // $data = json_decode(file_get_contents("php://input"));
+        $userId = $this->input->post("userId");
+        $amount = $this->input->post("amount");
   
-        if (!isset($data->userId) || !isset($data->amount)) {
+        if (!isset($userId) || !isset($amount)) {
             $this->response(array(                
                 "message" => "Field(s) Are Missing",                
             ), REST_Controller::HTTP_BAD_REQUEST);
-        } elseif (empty($data->userId) || empty($data->amount)) {
+        } elseif (empty($userId) || empty($amount)) {
             $this->response(array(                
                 "message" => "Field(s) Are Empty",                
             ), REST_Controller::HTTP_BAD_REQUEST);
-        } elseif ($this->session->userdata('user_'.$data->userId)) {                    
-            if (!$this->user_model->user_exist($data->userId)) {
+        } elseif ($this->session->userdata('user_'.$userId)) {                    
+            if (!$this->user_model->user_exist($userId)) {
                 $this->response(array(                
                     "message" => "User Does't Exist",                
                 ), REST_Controller::HTTP_BAD_REQUEST);
             } else {
-                $user = $this->user_model->get_user($data->userId);
-                if ($this->user_model->update_balance($data->userId, $user[0]->balance, $data->amount)) {
-                    $user = $this->user_model->get_user($data->userId);
+                $user = $this->user_model->get_user($userId);
+                if ($this->user_model->update_balance($userId, $user[0]->balance, $amount)) {
+                    $user = $this->user_model->get_user($userId);
                     $this->response(array(      
                         "mesage" => "Balance Updated",
                         "data" => array("userId" => $user[0]->id, "balance" => $user[0]->balance), 
