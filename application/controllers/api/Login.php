@@ -34,9 +34,11 @@ class Login extends REST_Controller {
             $userId = $this->user_model->validate_user($email, $password);
             if ($userId) {
                 // print_r("Logged In");
+                $user = $this->user_model->get_user($userId);
                 $this->session->set_userdata('user_'.$userId, 1);
                 $this->response(array(
                     "userId" => $userId,
+                    "userName" => $user[0]->name,
                     "status" => "Login Success",
                     "message" => "Session Initiated",                
                 ), REST_Controller::HTTP_OK);                
