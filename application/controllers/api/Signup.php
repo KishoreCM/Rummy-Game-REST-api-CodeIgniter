@@ -16,34 +16,37 @@ class Signup extends REST_Controller {
     public function index_post() {
         // echo "rummygame POST method";
 
-        $data = json_decode(file_get_contents("php://input"));
+        // $data = json_decode(file_get_contents("php://input"));
+        $name = $this->input->post("name");
+        $email = $this->input->post("email");
+        $password = $this->input->post("password");
+
+        $this->form_validation->set_rules("name", "Name", "required");
+        $this->form_validation->set_rules("email", "Email", "required|valid_email");
+        $this->form_validation->set_rules("password", "Password", "required");
       
-        if (!isset($data->name) || !isset($data->email) || !isset($data->password)) {
+        if ($this->form_validation->run() === FALSE) {
             $this->response(array(                
-                "message" => "Field(s) Are Missing",                
+                "message" => "All Field(s) Are Needed",                
             ), REST_Controller::HTTP_BAD_REQUEST);
-        } elseif (empty($data->name) || empty($data->email) || empty($data->password)) {
+        } elseif (empty($name) || empty($email) || empty($password)) {
             $this->response(array(                
                 "message" => "Field(s) Are Empty",                
             ), REST_Controller::HTTP_BAD_REQUEST);
-        } elseif (!filter_var($data->email, FILTER_VALIDATE_EMAIL)){
-            $this->response(array(                
-                "message" => "Invalid Email",                
-            ), REST_Controller::HTTP_BAD_REQUEST);
-        } elseif(strlen($data->password) < 5) {
+        } elseif(strlen($password) < 5) {
             $this->response(array(                
                 "message" => "Password Length Should Be Atleast of Length 5",                
             ), REST_Controller::HTTP_BAD_REQUEST);
-        } elseif($this->user_model->is_exist($data->email)){
+        } elseif($this->user_model->is_exist($email)){
             $this->response(array(                
                 "message" => "An User With this Email is Already Been Registered. Try Loggin In",                
             ), REST_Controller::HTTP_BAD_REQUEST);
         } else {
-            $encrypted_password = password_hash($data->password, PASSWORD_DEFAULT);            
+            $encrypted_password = password_hash($password, PASSWORD_DEFAULT);            
 
             $user = array(
-                "name" => $data->name,
-                "email" => $data->email,
+                "name" => $name,
+                "email" => $email,
                 "password" => $encrypted_password
             );
             if ($this->user_model->insert_user($user)) {
