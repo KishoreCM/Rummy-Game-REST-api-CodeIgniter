@@ -27,7 +27,7 @@ class Signup extends REST_Controller {
       
         if ($this->form_validation->run() === FALSE) {
             $this->response(array(                
-                "message" => "All Field(s) Are Needed",                
+                "message" => "All Field(s) are Either Needed or Not Valid",                
             ), REST_Controller::HTTP_BAD_REQUEST);
         } elseif (empty($name) || empty($email) || empty($password)) {
             $this->response(array(                
