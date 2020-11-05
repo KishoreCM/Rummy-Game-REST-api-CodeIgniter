@@ -112,13 +112,30 @@ class User_model extends CI_Model {
         return $query->result();
     }
 
-    public function update_bet_amount($userId, $gameId, $betAmount, $balance, $previousBetAmount) {
-        $updateBetAmount = array("bet_amount" => $previousBetAmount + $betAmount);
+    public function update_bet_amount($userId, $gameId, $betAmount, $isBetClosed) {
+        $updateBetAmount = array("bet_amount" => $betAmount, 'bet_closed' => $isBetClosed);
         $this->db->where(array('id' => $gameId, 'user_id' => $userId));
-        if ($this->db->update("game", $updateBetAmount)) {
-            $updateBalance = array("balance" => $balance - $betAmount);
-            $this->db->where('id', $userId);
-            return $this->db->update("users", $updateBalance);
+        return $this->db->update("game", $updateBetAmount);
+    }
+
+    public function is_all_bet_closed($gameId) {
+        $this->db->select('bet_closed');
+        $this->db->from('game');        
+        $this->db->where(array('game.id' => $gameId, 'bet_closed' => TRUE));                
+        $query = $this->db->get();
+        $users = $query->result();
+
+        $this->db->select('*');
+        $this->db->from('game');        
+        $this->db->where(array('game.id' => $gameId));                
+        $query = $this->db->get();
+
+        $userCount = $query->result();
+
+        if (count($users) === count($userCount)) {
+            return TRUE;
+        } else {
+            return FALSE;
         }
     }
 

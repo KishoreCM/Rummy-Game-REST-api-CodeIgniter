@@ -133,7 +133,7 @@ class User extends REST_Controller {
     public function betAmount_post() {
         $data = json_decode(file_get_contents("php://input"));
   
-        if (!isset($data->userId) || !isset($data->gameId) || !isset($data->betAmount)) {
+        if (!isset($data->userId) || !isset($data->gameId) || !isset($data->betAmount) || !isset($data->isBetClosed)) {
             $this->response(array(                
                 "message" => "Field(s) Are Missing",                
             ), REST_Controller::HTTP_BAD_REQUEST);
@@ -151,22 +151,24 @@ class User extends REST_Controller {
                     "message" => "A Room Has Not Been Created For This game_id", 
                 ), REST_Controller::HTTP_BAD_REQUEST);        
             } else {
-                $balanceDetails = $this->user_model->get_balance_details($data->userId, $data->gameId, $data->betAmount);
+                $balanceDetails = $this->user_model->get_balance_details($data->userId, $data->gameId, $data->betAmount, $data->isBetClosed);
 
                 if (count($balanceDetails) > 0) {                
                     if (($balanceDetails[0]->balance === 0.00) || ($data->betAmount > $balanceDetails[0]->balance)) {                
                         $this->response(array(                
                             "message" => "Insufficient Balance",                
                         ), REST_Controller::HTTP_BAD_REQUEST);
-                    } elseif ($this->user_model->update_bet_amount($data->userId, $data->gameId, $data->betAmount, $balanceDetails[0]->balance, $balanceDetails[0]->bet_amount)) {
+                    } elseif ($this->user_model->update_bet_amount($data->userId, $data->gameId, $data->betAmount, $data->isBetClosed)) {
                         $balanceDetails = $this->user_model->get_balance_details($data->userId, $data->gameId, $data->betAmount);
+                        $isAllBetClosed = $this->user_model->is_all_bet_closed($data->gameId);
                         $this->response(array(
                             "message" => "Bet Amount Updated",
                             "data" => array(
                                 "userId" => $balanceDetails[0]->user_id,
                                 "gameId" => $balanceDetails[0]->id,
                                 "betAmount" => $balanceDetails[0]->bet_amount,
-                                "balance" => $balanceDetails[0]->balance
+                                "balance" => ($balanceDetails[0]->balance - $balanceDetails[0]->bet_amount),
+                                "isAllBetClosed" => $isAllBetClosed
                             )
                         ), REST_Controller::HTTP_OK);
                     }
